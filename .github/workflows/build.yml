@@ -1,0 +1,38 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch: # Позволяет запускать сборку кнопкой
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Скачиваем код
+      uses: actions/checkout@v4
+
+    - name: Устанавливаем Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Устанавливаем Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        channel: 'stable'
+        flutter-version: '3.19.0'
+
+    - name: Устанавливаем зависимости
+      run: |
+        pip install flet
+        pip install -r requirements.txt
+
+    - name: Собираем APK
+      run: |
+        flet build apk smart_pay.py --verbose
+
+    - name: Загружаем готовый файл
+      uses: actions/upload-artifact@v4
+      with:
+        name: SmartPay-Release
+        path: build/apk/app-release.apk
